@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>King County - Parcels</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <!-- This will need to be updated as new versions are released. -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.15/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/WebTileLayer",
+            "esri/Basemap"
+        ], function (Map, MapView, FeatureLayer, WebTileLayer, Basemap) {
+
+            var mapBaseLayer = new WebTileLayer({
+                urlTemplate: "https://gismaps.kingcounty.gov/arcgis/rest/services/BaseMaps/KingCo_GenericBase/MapServer/tile/{level}/{row}/{col}",
+                copyright: 'King County, WA'
+            });
+
+            // Create a Basemap with the WebTileLayer.
+            var kingCounty = new Basemap({
+                baseLayers: [mapBaseLayer],
+                title: "King County Basemap",
+                id: "kcbasemap"
+            });
+
+            // Add the custom basemap to the map.
+            var map = new Map({
+                basemap: kingCounty
+                        });
+
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-121.8, 47.5], // longitude, latitude
+                zoom: 10
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>
