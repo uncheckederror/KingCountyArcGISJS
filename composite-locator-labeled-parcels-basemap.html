@@ -114,6 +114,17 @@
                 rotationEnabled: false  // Disables map rotation
             };
 
+            var locatorSymbol = {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                style: "circle",
+                color: "red",
+                size: "20px",  // pixels
+                outline: {  // autocasts as new SimpleLineSymbol()
+                  color: [ 255, 255, 255 ],
+                  width: 1  // points
+                }
+              };
+
             var searchWidget = new Search({
                 view: view,
                 allPlaceholder: "Parcel Number or Address",
@@ -124,6 +135,7 @@
                         singleLineFieldName: "SingleLine",
                         name: "Composite Locator",
                         placeholder: "Address or Parcel Number",
+                        resultSymbol: locatorSymbol,
                         maxResults: 3,
                         maxSuggestions: 6,
                         suggestionsEnabled: false,
@@ -148,23 +160,10 @@
                 console.log(event.results[0].results[0].extent.center.latitude);
                 console.log(event.results[0].results[0].extent.center.longitude);
                 console.log(map.layers);
-                view.hitTest(event).then(function(response){
-                    // Only return features for the feature layer
-                    var feature = response.results.filter(function (result) {
-                     return result.graphic.layer === featureLayer;
-                    })[0].graphic;
-                    if (feature) {
-                      // Show popup for new features only
-                      if (!view.popup.features.length || view.popup.features.length && (view.popup.features[0].attributes.FID !== feature.attributes.FID)) {
-                        view.popup.open({
-                          title: feature.attributes,
-                          content: "xx",
-                          location: feature.geometry
-                        });
-                      }
-                    }
-                  });
+
               });
+
+              
         });
     </script>
 </head>
