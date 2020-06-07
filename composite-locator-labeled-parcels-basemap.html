@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>King County - Parcels</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <!-- This will need to be updated as new versions are released. -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.15/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/WebTileLayer",
+            "esri/Basemap",
+            "esri/widgets/Search",
+            "esri/widgets/Search/LocatorSearchSource",
+            "esri/tasks/Locator"
+        ], function (Map, MapView, FeatureLayer, WebTileLayer, Basemap, Search, LocatorSearchSource, Locator) {
+
+            const labelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PIN"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            var mapBaseLayer = new WebTileLayer({
+                urlTemplate: "https://gismaps.kingcounty.gov/arcgis/rest/services/BaseMaps/KingCo_GenericBase/MapServer/tile/{level}/{row}/{col}",
+                copyright: 'King County, WA'
+            });
+
+            // Create a Basemap with the WebTileLayer.
+            var kingCounty = new Basemap({
+                baseLayers: [mapBaseLayer],
+                title: "King County Basemap",
+                id: "kcbasemap",
+                maxScale: 0
+            });
+
+            // Add the custom basemap to the map.
+            var map = new Map({
+                basemap: kingCounty
+            });
+
+            // King County parcels as a Feature layer.
+            var kingCountyParcels = new FeatureLayer({
+                url: "https://gisdata.kingcounty.gov/arcgis/rest/services/OpenDataPortal/property__parcel_area/MapServer/439/",
+                opacity: 0.5,
+                labelingInfo: [labelClass],
+                maxScale: 0
+            });
+
+            var symbol = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: {
+                    type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                    size: 6,
+                    color: "transparent",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        width: 0.5,
+                        color: "black"
+                    }
+                }
+            };
+
+            kingCountyParcels.renderer = symbol;
+
+            var template = {
+                // autocasts as new PopupTemplate()
+                title: "<a target='_blank noreferrer' href='https://blue.kingcounty.com/Assessor/eRealProperty/Dashboard.aspx?ParcelNbr={PIN}'>{PIN}</a>",
+            };
+
+            kingCountyParcels.popupTemplate = template;
+            // Add it to the map.
+            map.add(kingCountyParcels, 0);
+
+            // Create a view of the map and render it to the DOM.
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-122.32, 47.61], // longitude, latitude.
+                zoom: 16 // Parcels aren't visible above zoom level 16.
+            });
+
+            view.constraints = {
+                minScale: 500000,  // User cannot zoom out beyond a scale of 1:500,000
+                maxScale: 0,  // User can overzoom tiles
+                rotationEnabled: false  // Disables map rotation
+            };
+
+            var searchWidget = new Search({
+                view: view,
+                allPlaceholder: "Parcel Number or Address",
+                sources: [
+                    // Adds the King County GIS composite locator.
+                    {
+                        locator: new Locator({ url: "https://gismaps.kingcounty.gov/arcgis/rest/services/Address/Composite_locator/GeocodeServer" }),
+                        singleLineFieldName: "SingleLine",
+                        name: "Composite Locator",
+                        placeholder: "Address or Parcel Number",
+                        maxResults: 3,
+                        maxSuggestions: 6,
+                        suggestionsEnabled: false,
+                        minSuggestCharacters: 0,
+                        popupEnabled: false,
+                        zoomScale: 0
+                    }
+                ],
+                // Remove the ESRI world geocoder.
+                includeDefaultSources: false
+            });
+
+            // Adds the search widget to the top right corner of the view
+            view.ui.add(
+                searchWidget,
+                "top-right"
+            );
+
+            searchWidget.on("search-complete", function(event){
+                // The results are stored in the event Object[]
+                console.log("Results of the search: ", event);
+                console.log(event.results[0].results[0].extent.center.latitude);
+                console.log(event.results[0].results[0].extent.center.longitude);
+                console.log(map.layers);
+                view.hitTest(event).then(function(response){
+                    // Only return features for the feature layer
+                    var feature = response.results.filter(function (result) {
+                     return result.graphic.layer === featureLayer;
+                    })[0].graphic;
+                    if (feature) {
+                      // Show popup for new features only
+                      if (!view.popup.features.length || view.popup.features.length && (view.popup.features[0].attributes.FID !== feature.attributes.FID)) {
+                        view.popup.open({
+                          title: feature.attributes,
+                          content: "xx",
+                          location: feature.geometry
+                        });
+                      }
+                    }
+                  });
+              });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>
