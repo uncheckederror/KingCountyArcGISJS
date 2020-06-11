@@ -30,7 +30,7 @@
             "esri/tasks/Locator"
         ], function (Map, MapView, FeatureLayer, WebTileLayer, Basemap, Search, LocatorSearchSource, Locator) {
 
-            const labelClass = {
+            const kcParcelslabelClass = {
                 // autocasts as new LabelClass()
                 symbol: {
                     type: "text", // autocasts as new TextSymbol()
@@ -45,6 +45,26 @@
                 labelPlacement: "center-along",
                 labelExpressionInfo: {
                     expression: "$feature.PIN"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const snocoParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCEL_ID"
                 },
                 maxScale: 0,
                 minScale: 2500
@@ -68,11 +88,18 @@
                 basemap: kingCounty
             });
 
+            // Wastewater Service Area as a Feature layer.
+            var wasterwaterArea = new FeatureLayer({
+                url: "https://gisdata.kingcounty.gov/arcgis/rest/services/OpenDataPortal/utility___base/MapServer/2478/",
+                opacity: 0.5,
+                maxScale: 0
+            });
+
             // King County parcels as a Feature layer.
             var kingCountyParcels = new FeatureLayer({
                 url: "https://gisdata.kingcounty.gov/arcgis/rest/services/OpenDataPortal/property__parcel_area/MapServer/439/",
                 opacity: 0.5,
-                labelingInfo: [labelClass],
+                labelingInfo: [kcParcelslabelClass],
                 maxScale: 0
             });
 
@@ -97,8 +124,21 @@
             };
 
             kingCountyParcels.popupTemplate = template;
-            // Add it to the map.
-            map.add(kingCountyParcels, 0);
+
+            // King County parcels as a Feature layer.
+            var snocoParcels = new FeatureLayer({
+                url: "https://gismaps.snoco.org/securegis/rest/services/cadastral/tax_parcels/MapServer",
+                opacity: 0.5,
+                labelingInfo: [snocoParcelslabelClass],
+                maxScale: 0
+            });
+
+            snocoParcels.renderer = symbol;
+
+            // Add the layers to the map in a specific order.
+            map.add(wasterwaterArea);
+            map.add(snocoParcels);
+            map.add(kingCountyParcels);
 
             // Create a view of the map and render it to the DOM.
             var view = new MapView({
@@ -120,10 +160,10 @@
                 color: "red",
                 size: "20px",  // pixels
                 outline: {  // autocasts as new SimpleLineSymbol()
-                  color: [ 255, 255, 255 ],
-                  width: 1  // points
+                    color: [255, 255, 255],
+                    width: 1  // points
                 }
-              };
+            };
 
             var searchWidget = new Search({
                 view: view,
@@ -154,16 +194,16 @@
                 "top-right"
             );
 
-            searchWidget.on("search-complete", function(event){
+            searchWidget.on("search-complete", function (event) {
                 // The results are stored in the event Object[]
                 console.log("Results of the search: ", event);
                 console.log(event.results[0].results[0].extent.center.latitude);
                 console.log(event.results[0].results[0].extent.center.longitude);
                 console.log(map.layers);
 
-              });
+            });
 
-              
+
         });
     </script>
 </head>
