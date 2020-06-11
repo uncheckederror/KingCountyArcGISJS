@@ -70,6 +70,26 @@
                 minScale: 2500
             };
 
+            const pierceParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.TaxParcelNumber"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
             var mapBaseLayer = new WebTileLayer({
                 urlTemplate: "https://gismaps.kingcounty.gov/arcgis/rest/services/BaseMaps/KingCo_GenericBase/MapServer/tile/{level}/{row}/{col}",
                 copyright: 'King County, WA'
@@ -135,9 +155,20 @@
 
             snocoParcels.renderer = symbol;
 
+            // King County parcels as a Feature layer.
+            var pierceParcels = new FeatureLayer({
+                url: "https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0/",
+                opacity: 0.5,
+                labelingInfo: [pierceParcelslabelClass],
+                maxScale: 0
+            });
+
+            pierceParcels.renderer = symbol;
+
             // Add the layers to the map in a specific order.
             map.add(wasterwaterArea);
             map.add(snocoParcels);
+            map.add(pierceParcels);
             map.add(kingCountyParcels);
 
             // Create a view of the map and render it to the DOM.
