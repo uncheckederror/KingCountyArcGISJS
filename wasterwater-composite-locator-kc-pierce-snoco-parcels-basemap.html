@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>King County - Parcels</title>
+    <title>King County - Wasterwater Escrow Account Lookup</title>
     <style>
         html,
         body,
@@ -138,14 +138,14 @@
 
             kingCountyParcels.renderer = symbol;
 
-            var template = {
+            var kcTemplate = {
                 // autocasts as new PopupTemplate()
                 title: "<a target='_blank noreferrer' href='https://blue.kingcounty.com/Assessor/eRealProperty/Dashboard.aspx?ParcelNbr={PIN}'>{PIN}</a>",
             };
 
-            kingCountyParcels.popupTemplate = template;
+            kingCountyParcels.popupTemplate = kcTemplate;
 
-            // King County parcels as a Feature layer.
+            // Snohomish parcels as a Feature layer.
             var snocoParcels = new FeatureLayer({
                 url: "https://gismaps.snoco.org/securegis/rest/services/cadastral/tax_parcels/MapServer",
                 opacity: 0.5,
@@ -155,7 +155,14 @@
 
             snocoParcels.renderer = symbol;
 
-            // King County parcels as a Feature layer.
+            var snocoTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCEL_ID}",
+            };
+
+            snocoParcels.popupTemplate = snocoTemplate;
+
+            // Pierce County parcels as a Feature layer.
             var pierceParcels = new FeatureLayer({
                 url: "https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0/",
                 opacity: 0.5,
@@ -164,6 +171,13 @@
             });
 
             pierceParcels.renderer = symbol;
+       
+            var pierceTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{TaxParcelNumber}",
+            };
+
+            pierceParcels.popupTemplate = pierceTemplate;
 
             // Add the layers to the map in a specific order.
             map.add(wasterwaterArea);
@@ -200,17 +214,17 @@
                 view: view,
                 allPlaceholder: "Parcel Number or Address",
                 sources: [
-                    // Adds the King County GIS composite locator.
+                    // Adds the Four County composite locator.
                     {
-                        locator: new Locator({ url: "https://gismaps.kingcounty.gov/arcgis/rest/services/Address/Composite_locator/GeocodeServer" }),
+                        locator: new Locator({ url: "https://gismaps.kingcounty.gov/arcgis/rest/services/Address/FourCounty_composite_locator/GeocodeServer" }),
                         singleLineFieldName: "SingleLine",
-                        name: "Composite Locator",
-                        placeholder: "Address or Parcel Number",
+                        name: "All Counties",
+                        placeholder: "Address with City and Zip or a Parcel Number",
                         resultSymbol: locatorSymbol,
                         maxResults: 3,
                         maxSuggestions: 6,
-                        suggestionsEnabled: false,
-                        minSuggestCharacters: 0,
+                        suggestionsEnabled: true,
+                        minSuggestCharacters: 3,
                         popupEnabled: false,
                         zoomScale: 0
                     }
