@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>King County - Wasterwater Escrow Account Lookup</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <!-- This will need to be updated as new versions are released. -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.15/"></script>
+    <script>
+        function getParamValue(paramName) {
+            var url = window.location.search.substring(1);
+            var qArray = url.split('&');
+            for (var i = 0; i < qArray.length; i++) {
+                var pArr = qArray[i].split('='); //split key and value
+                if (pArr[0] == paramName)
+                    return pArr[1]; //return value
+            }
+        }
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/WebTileLayer",
+            "esri/Basemap",
+            "esri/widgets/Search",
+            "esri/widgets/Search/LocatorSearchSource",
+            "esri/tasks/Locator"
+        ], function (Map, MapView, FeatureLayer, WebTileLayer, Basemap, Search, LocatorSearchSource, Locator) {
+
+            // Grab the location information from the URL that this page was opened with.
+            var param = getParamValue("data");
+            if (param) {
+                param = param.replace(/%20/g, " ");
+                param = param.replace(/%2c/g, ",");
+            }
+
+            const kcParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PIN"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const snocoParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCEL_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const pierceParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.TaxParcelNumber"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            var mapBaseLayer = new WebTileLayer({
+                urlTemplate: "https://gismaps.kingcounty.gov/arcgis/rest/services/BaseMaps/KingCo_GenericBase/MapServer/tile/{level}/{row}/{col}",
+                copyright: 'King County, WA'
+            });
+
+            // Create a Basemap with the WebTileLayer.
+            var kingCounty = new Basemap({
+                baseLayers: [mapBaseLayer],
+                title: "King County Basemap",
+                id: "kcbasemap",
+                maxScale: 0
+            });
+
+            // Add the custom basemap to the map.
+            var map = new Map({
+                basemap: kingCounty
+            });
+
+            var wasterwaterRenderer = {
+                type: "simple",
+                symbol: {
+                    color: "#BAE1FF",
+                    type: "simple-fill",
+                    style: "solid",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        width: 1,
+                        color: "red"
+                    }
+                }
+            }
+            // Wastewater Service Area as a Feature layer.
+            var wasterwaterArea = new FeatureLayer({
+                url: "https://gisdata.kingcounty.gov/arcgis/rest/services/OpenDataPortal/utility___base/MapServer/2478/",
+                opacity: 0.5,
+                renderer: wasterwaterRenderer,
+                maxScale: 0
+            });
+
+            // King County parcels as a Feature layer.
+            var kingCountyParcels = new FeatureLayer({
+                url: "https://gisdata.kingcounty.gov/arcgis/rest/services/OpenDataPortal/property__parcel_area/MapServer/439/",
+                opacity: 0.5,
+                labelingInfo: [kcParcelslabelClass],
+                maxScale: 0
+            });
+
+            var symbol = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: {
+                    type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                    size: 6,
+                    color: "transparent",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        width: 0.5,
+                        color: "black"
+                    }
+                }
+            };
+
+            kingCountyParcels.renderer = symbol;
+
+            var kcTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "<a target='_blank noreferrer' href='https://blue.kingcounty.com/Assessor/eRealProperty/Dashboard.aspx?ParcelNbr={PIN}'>{PIN}</a>",
+            };
+
+            kingCountyParcels.popupTemplate = kcTemplate;
+
+            // Snohomish parcels as a Feature layer.
+            var snocoParcels = new FeatureLayer({
+                url: "https://gismaps.snoco.org/securegis/rest/services/cadastral/tax_parcels/MapServer",
+                opacity: 0.5,
+                labelingInfo: [snocoParcelslabelClass],
+                maxScale: 0
+            });
+
+            snocoParcels.renderer = symbol;
+
+            var snocoTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCEL_ID}",
+            };
+
+            snocoParcels.popupTemplate = snocoTemplate;
+
+            // Pierce County parcels as a Feature layer.
+            var pierceParcels = new FeatureLayer({
+                url: "https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0/",
+                opacity: 0.5,
+                labelingInfo: [pierceParcelslabelClass],
+                maxScale: 0
+            });
+
+            pierceParcels.renderer = symbol;
+
+            var pierceTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{TaxParcelNumber}",
+            };
+
+            pierceParcels.popupTemplate = pierceTemplate;
+
+            // Add the layers to the map in a specific order.
+            map.add(wasterwaterArea);
+            map.add(snocoParcels);
+            map.add(pierceParcels);
+            map.add(kingCountyParcels);
+
+            // Create a view of the map and render it to the DOM.
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-122.32, 47.61], // longitude, latitude.
+                zoom: 16 // Parcels aren't visible above zoom level 16.
+            });
+
+            view.constraints = {
+                minScale: 500000,  // User cannot zoom out beyond a scale of 1:500,000
+                maxScale: 0,  // User can overzoom tiles
+                rotationEnabled: false  // Disables map rotation
+            };
+
+            var locatorSymbol = {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                style: "circle",
+                color: "red",
+                size: "20px",  // pixels
+                outline: {  // autocasts as new SimpleLineSymbol()
+                    color: [255, 255, 255],
+                    width: 1  // points
+                }
+            };
+
+            var searchWidget = new Search({
+                view: view,
+                allPlaceholder: "Parcel Number or Address",
+                sources: [
+                    // Adds the Four County composite locator.
+                    {
+                        locator: new Locator({ url: "https://gismaps.kingcounty.gov/arcgis/rest/services/Address/FourCounty_composite_locator/GeocodeServer" }),
+                        singleLineFieldName: "SingleLine",
+                        name: "All Counties",
+                        placeholder: "Address with City and Zip or a Parcel Number",
+                        resultSymbol: locatorSymbol,
+                        maxResults: 3,
+                        maxSuggestions: 6,
+                        suggestionsEnabled: true,
+                        minSuggestCharacters: 3,
+                        popupEnabled: false,
+                        zoomScale: 0
+                    }
+                ],
+                // Pass the URL parameters into the search widget
+                searchTerm: param,
+                // Remove the ESRI world geocoder.
+                includeDefaultSources: false
+            });
+
+            // Adds the search widget to the top right corner of the view
+            view.ui.add(
+                searchWidget,
+                "top-right"
+            );
+
+            // When the page loads execute a search
+            view.when(() => {
+                searchWidget.search();
+            });
+
+            searchWidget.on("search-complete", function (event) {
+
+            });
+        });
+    </script>
+    <meta>
+</head>
+
+<body style="overflow-wrap: break-word;" onfocusout="parent.setEmailRange();">
+    <div id="viewDiv"></div>
+</body>
+
+</html>
