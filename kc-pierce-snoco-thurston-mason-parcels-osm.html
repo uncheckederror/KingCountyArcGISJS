@@ -251,6 +251,106 @@
                 minScale: 2500
             };
 
+            const garfieldParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCEL_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const columbiaParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.Geo_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const grantParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCEL"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const asotinParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCEL_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const kittitasParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCELID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
             const stateParcelslabelClass = {
                 // autocasts as new LabelClass()
                 symbol: {
@@ -480,7 +580,7 @@
 
             bentonParcels.popupTemplate = bentonTemplate;
 
-            // Benton county parcels as a Feature layer.
+            // Franklin county parcels as a Feature layer.
             var franklinParcels = new FeatureLayer({
                 url: "https://gisportal.franklin.co.franklin.wa.us:6443/arcgis/rest/services/parcels/MapServer/",
                 opacity: 0.8,
@@ -496,7 +596,97 @@
                 title: "{PARCELNUMBER}",
             };
 
-            franklinParcels.popupTemplate = bentonTemplate;
+            franklinParcels.popupTemplate = franklinTemplate;
+
+            // Columbia county parcels as a Feature layer.
+            var columbiaParcels = new FeatureLayer({
+                url: "https://services9.arcgis.com/zq1Ay6bxXC1T1CBk/ArcGIS/rest/services/Parcels/FeatureServer",
+                opacity: 0.8,
+                labelingInfo: [columbiaParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            columbiaParcels.renderer = symbol;
+
+            var columbiaTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{Geo_ID}",
+            };
+
+            columbiaParcels.popupTemplate = columbiaTemplate;
+
+            // Garfield county parcels as a Feature layer.
+            var garfieldParcels = new FeatureLayer({
+                url: "https://services5.arcgis.com/1UmAlNNRc6UDVQ4y/ArcGIS/rest/services/Garfield_County_Geodatabase/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [garfieldParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            garfieldParcels.renderer = symbol;
+
+            var garfieldTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCEL_ID}",
+            };
+
+            garfieldParcels.popupTemplate = garfieldTemplate;
+
+            // Asotin county parcels as a Feature layer.
+            var asotinParcels = new FeatureLayer({
+                url: "https://services6.arcgis.com/VsJGTl1jmCYBc0EX/ArcGIS/rest/services/Parcels_November_2020/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [asotinParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            asotinParcels.renderer = symbol;
+
+            var asotinTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCEL_ID}",
+            };
+
+            asotinParcels.popupTemplate = asotinTemplate;
+
+            // Grant county parcels as a Feature layer.
+            var grantParcels = new FeatureLayer({
+                url: "https://services2.arcgis.com/hQZvdtFxRzJpMtdS/ArcGIS/rest/services/Parcels/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [grantParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            grantParcels.renderer = symbol;
+
+            var grantTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCEL}",
+            };
+
+            grantParcels.popupTemplate = grantTemplate;
+
+            // Kittitas county parcels as a Feature layer.
+            var kittitasParcels = new FeatureLayer({
+                url: "https://gis.co.kittitas.wa.us/kcgis/rest/services/OpenData/Parcels/MapServer/1/",
+                opacity: 0.8,
+                labelingInfo: [kittitasParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            kittitasParcels.renderer = symbol;
+
+            var kittitasTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCELID}",
+            };
+
+            kittitasParcels.popupTemplate = grantTemplate;
 
             // Parcels from the state of WA
             var stateParcels = new FeatureLayer({
@@ -573,6 +763,13 @@
                 minScale: 200000
             });
 
+            var klickitatParcels = new MapImageLayer({
+                url: "https://webmap.trueautomation.com/arcgis/rest/services/WallaMapSearch/MapServer",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
             // Parcels from the state of WA
             var countyBoundaries = new FeatureLayer({
                 url: "https://gis.dnr.wa.gov/site3/rest/services/Public_Boundaries/WADNR_PUBLIC_Cadastre_OpenData/MapServer/11/",
@@ -593,6 +790,11 @@
 
             // Add the layers to the map in a specific order.
             //map.add(stateParcels);
+            map.add(kittitasParcels);
+            map.add(grantParcels);
+            map.add(asotinParcels);
+            map.add(garfieldParcels);
+            map.add(columbiaParcels);
             map.add(franklinParcels);
             map.add(bentonParcels);
             map.add(yakimaParcels);
