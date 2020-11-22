@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>King County - Wasterwater Escrow Account Lookup</title>
+    <title>WA Parcel Viewer</title>
     <style>
         html,
         body,
@@ -111,6 +111,146 @@
                 minScale: 2500
             };
 
+            const wahkiakumParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.Property_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const clarkParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.Property ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const islandParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.ParcelNo"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const sanJuanParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PIN"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const yakimaParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.ASSESSOR_N"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const bentonParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.Parcel_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const franklinParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.PARCELNUMBER"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
             const stateParcelslabelClass = {
                 // autocasts as new LabelClass()
                 symbol: {
@@ -129,6 +269,26 @@
                 },
                 maxScale: 0,
                 minScale: 2500
+            };
+
+            const countyBoundarieslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 14,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.JURISDICT_NM"
+                },
+                maxScale: 2500,
+                minScale: 0
             };
 
             // Add the custom basemap to the map.
@@ -171,7 +331,8 @@
                 url: "https://gismaps.snoco.org/securegis/rest/services/cadastral/tax_parcels/MapServer",
                 opacity: 0.8,
                 labelingInfo: [snocoParcelslabelClass],
-                maxScale: 0
+                maxScale: 0,
+                minScale: 200000
             });
 
             snocoParcels.renderer = symbol;
@@ -188,7 +349,8 @@
                 url: "https://services2.arcgis.com/1UvBaQ5y1ubjUPmd/arcgis/rest/services/Tax_Parcels/FeatureServer/0/",
                 opacity: 0.8,
                 labelingInfo: [pierceParcelslabelClass],
-                maxScale: 0
+                maxScale: 0,
+                minScale: 200000
             });
 
             pierceParcels.renderer = symbol;
@@ -205,7 +367,8 @@
                 url: "https://map.co.thurston.wa.us/arcgis/rest/services/Thurston/Thurston_Parcels/FeatureServer/0/",
                 opacity: 0.8,
                 labelingInfo: [thurstonParcelslabelClass],
-                maxScale: 0
+                maxScale: 0,
+                minScale: 200000
             });
 
             thurstonParcels.renderer = symbol;
@@ -216,6 +379,124 @@
             };
 
             thurstonParcels.popupTemplate = thurstonTemplate;
+
+            // Wahkiakum county parcels as a Feature layer.
+            var wahkiakumParcels = new FeatureLayer({
+                url: "https://services5.arcgis.com/SQaKrZ90pTH1GKNW/ArcGIS/rest/services/Parcels_11_10_2020/FeatureServer",
+                opacity: 0.8,
+                labelingInfo: [wahkiakumParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            wahkiakumParcels.renderer = symbol;
+
+            var wahkiakumTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{Property_ID}",
+            };
+
+            wahkiakumParcels.popupTemplate = wahkiakumTemplate;
+
+            // Clark county parcels as a Feature layer.
+            var clarkParcels = new FeatureLayer({
+                url: "https://services2.arcgis.com/ylxwjFBdCPBzP16d/arcgis/rest/services/TaxlotsPublic/FeatureServer/0/query?outFields=*&where=1%3D1",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            clarkParcels.renderer = symbol;
+
+            // Island county parcels as a Feature layer.
+            var islandParcels = new FeatureLayer({
+                url: "https://services6.arcgis.com/Q2crTJYujvn27IJC/arcgis/rest/services/Parcels/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [islandParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            islandParcels.renderer = symbol;
+
+            var islandTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{Property_ID}",
+            };
+
+            islandParcels.popupTemplate = islandTemplate;
+
+            // San Juan county parcels as a Feature layer.
+            var sanJuanParcels = new FeatureLayer({
+                url: "https://gis.sanjuanco.com/arcgis/rest/services/OpenData/Parcels/MapServer/0/",
+                opacity: 0.8,
+                labelingInfo: [sanJuanParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            sanJuanParcels.renderer = symbol;
+
+            var sanJuanTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PIN}",
+            };
+
+            sanJuanParcels.popupTemplate = sanJuanTemplate;
+
+            // Yakima county parcels as a Feature layer.
+            var yakimaParcels = new FeatureLayer({
+                url: "https://services3.arcgis.com/9Qz94N8Zml9hnG84/arcgis/rest/services/Parcels/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [yakimaParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            yakimaParcels.renderer = symbol;
+
+            var yakimaTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{ASSESSOR_N}",
+            };
+
+            yakimaParcels.popupTemplate = yakimaTemplate;
+
+            // Benton county parcels as a Feature layer.
+            var bentonParcels = new FeatureLayer({
+                url: "https://services7.arcgis.com/NURlY7V8UHl6XumF/arcgis/rest/services/Parcels_and_Assess/FeatureServer/",
+                opacity: 0.8,
+                labelingInfo: [bentonParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            bentonParcels.renderer = symbol;
+
+            var bentonTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{Parcel_ID}",
+            };
+
+            bentonParcels.popupTemplate = bentonTemplate;
+
+            // Benton county parcels as a Feature layer.
+            var franklinParcels = new FeatureLayer({
+                url: "https://gisportal.franklin.co.franklin.wa.us:6443/arcgis/rest/services/parcels/MapServer/",
+                opacity: 0.8,
+                labelingInfo: [franklinParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            franklinParcels.renderer = symbol;
+
+            var franklinTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{PARCELNUMBER}",
+            };
+
+            franklinParcels.popupTemplate = bentonTemplate;
 
             // Parcels from the state of WA
             var stateParcels = new FeatureLayer({
@@ -239,27 +520,110 @@
             var masonParcels = new MapImageLayer({
                 url: "https://gis.co.mason.wa.us/arcgis/rest/services/MasonCoSite/TaxParcels/MapServer",
                 opacity: 0.8,
-                maxScale: 0
+                maxScale: 0,
+                minScale: 200000
             });
+
+            var jeffersonParcels = new MapImageLayer({
+                url: "https://gisweb.jeffcowa.us/server/rest/services/LandRecords/PublicTaxParcels/MapServer/",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var clallamParcels = new MapImageLayer({
+                url: "https://websrv19.clallam.net/arcgis/rest/services/web/ParcelMap/MapServer",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var cowlitzParcels = new MapImageLayer({
+                url: "https://www.cowlitzinfo.net/arcgis/rest/services/WSPublic/ParcelsDark/MapServer",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var lewisParcels = new MapImageLayer({
+                url: "https://arcgis.lewiscountywa.gov/arcgispublic/rest/services/Public/BaseLayers/MapServer/",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var skagitParcels = new MapImageLayer({
+                url: "https://www.skagitcounty.net/gispublic/rest/services/Assessor/PropertyInfoWebMap/MapServer/",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var whatcomParcels = new MapImageLayer({
+                url: "https://gis.whatcomcounty.us/arcgis/rest/services/Applications/PACSGIS_Viewer/MapServer",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            var klickitatParcels = new MapImageLayer({
+                url: "http://imap.klickitatcounty.org/arcgis/rest/services/Klickitat/Klickitat_TOC_Dynamic/MapServer",
+                opacity: 0.8,
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            // Parcels from the state of WA
+            var countyBoundaries = new FeatureLayer({
+                url: "https://gis.dnr.wa.gov/site3/rest/services/Public_Boundaries/WADNR_PUBLIC_Cadastre_OpenData/MapServer/11/",
+                opacity: 0.8,
+                labelingInfo: [countyBoundarieslabelClass],
+                maxScale: 2500,
+                minScale: 0
+            });
+
+            countyBoundaries.renderer = symbol;
+
+            var countiesTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{JURISDICT_NM}",
+            };
+
+            countyBoundaries.popupTemplate = countiesTemplate;
 
             // Add the layers to the map in a specific order.
             //map.add(stateParcels);
+            map.add(franklinParcels);
+            map.add(bentonParcels);
+            map.add(yakimaParcels);
+            map.add(klickitatParcels);
+            map.add(sanJuanParcels);
+            map.add(whatcomParcels);
+            map.add(skagitParcels);
+            map.add(islandParcels);
+            map.add(lewisParcels);
+            map.add(clarkParcels);
+            map.add(cowlitzParcels);
+            map.add(wahkiakumParcels);
+            map.add(clallamParcels);
+            map.add(jeffersonParcels);
             map.add(masonParcels);
             map.add(thurstonParcels);
             map.add(snocoParcels);
             map.add(pierceParcels);
             map.add(kingCountyParcels);
+            map.add(countyBoundaries);
 
             // Create a view of the map and render it to the DOM.
             var view = new MapView({
                 container: "viewDiv",
                 map: map,
-                center: [-122.32, 47.61], // longitude, latitude.
-                zoom: 16 // Parcels aren't visible above zoom level 16.
+                center: [-121.0, 47.61], // longitude, latitude.
+                zoom: 6 // Parcels aren't visible above zoom level 16.
             });
 
             view.constraints = {
-                minScale: 500000,  // User cannot zoom out beyond a scale of 1:500,000
+                minScale: 2500000,  // User cannot zoom out beyond a scale of 1:500,000
                 maxScale: 0,  // User can overzoom tiles
                 rotationEnabled: false  // Disables map rotation
             };
