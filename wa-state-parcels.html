@@ -454,6 +454,27 @@
                 minScale: 2500
             };
 
+
+            const chelanParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.sde_CHELAN_Property_Polygons_pr"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
             const stateParcelslabelClass = {
                 // autocasts as new LabelClass()
                 symbol: {
@@ -881,6 +902,24 @@
 
             pendOreilleParcels.popupTemplate = pendOreilleTemplate;
 
+            // Chelan county parcels as a Feature layer.
+            var chelanParcels = new FeatureLayer({
+                url: "https://atlas.co.chelan.wa.us/arcgis/rest/services/GIS/ParcelsOwners/MapServer/0/",
+                opacity: 0.8,
+                labelingInfo: [pendOreilleParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            chelanParcels.renderer = symbol;
+
+            var chelanTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{sde_CHELAN_Property_Polygons_pr}",
+            };
+
+            chelanParcels.popupTemplate = chelanTemplate;
+
             // Parcels from the state of WA
             var stateParcels = new FeatureLayer({
                 url: "https://services.arcgis.com/jsIt88o09Q0r1j8h/arcgis/rest/services/Current_Parcels_2020/FeatureServer/0/",
@@ -956,7 +995,7 @@
                 minScale: 200000
             });
 
-            var klickitatParcels = new MapImageLayer({
+            var wallaWallaParcels = new MapImageLayer({
                 url: "https://webmap.trueautomation.com/arcgis/rest/services/WallaMapSearch/MapServer",
                 opacity: 0.8,
                 maxScale: 0,
@@ -964,7 +1003,7 @@
             });
 
             // Parcels from the state of WA
-            var countyBoundaries = new FeatureLayer({
+            var countyBoundariesOutlines = new FeatureLayer({
                 url: "https://gis.dnr.wa.gov/site3/rest/services/Public_Boundaries/WADNR_PUBLIC_Cadastre_OpenData/MapServer/11/",
                 opacity: 0.8,
                 labelingInfo: [countyBoundarieslabelClass],
@@ -972,7 +1011,164 @@
                 minScale: 0
             });
 
-            countyBoundaries.renderer = symbol;
+            countyBoundariesOutlines.renderer = symbol;
+
+            // Parcels from the state of WA
+            var countyBoundaries = new FeatureLayer({
+                url: "https://gis.dnr.wa.gov/site3/rest/services/Public_Boundaries/WADNR_PUBLIC_Cadastre_OpenData/MapServer/11/",
+                opacity: 0.1,
+                labelingInfo: [countyBoundarieslabelClass],
+                maxScale: 200000,
+                minScale: 0
+            });
+
+            var supportedCountiesRenderer = {
+                type: "unique-value",  // autocasts as new UniqueValueRenderer()
+                field: "JURISDICT_NM",
+                defaultSymbol: {
+                    type: "simple-fill",
+                    color: "transparent"
+                },  // autocasts as new SimpleFillSymbol()
+                uniqueValueInfos: [{
+                    // All features with value of "North" will be blue
+                    value: "Clallam County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "East" will be green
+                    value: "Jefferson County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "South" will be red
+                    value: "Mason County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Grays Harbor County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Pacific County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Thurston County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Kitsap County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Skamania County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Skagit County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Whatcom County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Cowlitz County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Walla Walla County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Klickitat County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "yellow"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Whitman County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Adams County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Douglas County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    },
+                },
+                {
+                    // All features with value of "West" will be yellow
+                    value: "Okanogan County",
+                    symbol: {
+                        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+                        color: "red"
+                    }
+                }]
+            };
+
+            countyBoundaries.renderer = supportedCountiesRenderer;
+
 
             var countiesTemplate = {
                 // autocasts as new PopupTemplate()
@@ -982,6 +1178,7 @@
             countyBoundaries.popupTemplate = countiesTemplate;
 
             // Add the layers to the map in a specific order.
+            map.add(chelanParcels);
             map.add(pendOreilleParcels);
             map.add(stevensParcels);
             map.add(ferryParcels);
@@ -992,6 +1189,7 @@
             map.add(asotinParcels);
             map.add(garfieldParcels);
             map.add(columbiaParcels);
+            map.add(wallaWallaParcels);
             map.add(franklinParcels);
             map.add(bentonParcels);
             map.add(yakimaParcels);
@@ -1011,6 +1209,7 @@
             map.add(snocoParcels);
             map.add(pierceParcels);
             map.add(kingCountyParcels);
+            map.add(countyBoundariesOutlines);
             map.add(countyBoundaries);
             // The layers above are primary sources collected from each individual county.
             // They will show the updates that the counties make to their parcel data instantly.
