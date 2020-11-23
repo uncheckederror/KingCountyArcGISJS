@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Washington State Parcel Viewer</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <!-- This will need to be updated as new versions are released. -->
+    <link rel="stylesheet" href="https://js.arcgis.com/4.17/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.17/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/layers/FeatureLayer",
+            "esri/layers/WebTileLayer",
+            "esri/Basemap",
+            "esri/widgets/Search",
+            "esri/widgets/Search/LocatorSearchSource",
+            "esri/tasks/Locator",
+            "esri/layers/MapImageLayer"
+        ], function (Map, MapView, FeatureLayer, WebTileLayer, Basemap, Search, LocatorSearchSource, Locator, MapImageLayer) {
+
+            // Every county has a different format for their data and different ideas about how to identify a parcel of land.
+            // Some call a parcel's Id a Parcel Number, some a PIN, yet others call it a Geo Id.
+            // Given these constraints each featureLayer label class has to be customized to pull the right Id out of the data source.
+
+            const stateParcelslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 8,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.ORIG_PARCEL_ID"
+                },
+                maxScale: 0,
+                minScale: 2500
+            };
+
+            const countyBoundarieslabelClass = {
+                // autocasts as new LabelClass()
+                symbol: {
+                    type: "text", // autocasts as new TextSymbol()
+                    color: "black",
+                    font: {
+                        // autocast as new Font()
+                        family: "sans-serif",
+                        size: 14,
+                        weight: "lighter"
+                    }
+                },
+                labelPlacement: "center-along",
+                labelExpressionInfo: {
+                    expression: "$feature.JURISDICT_NM"
+                },
+                maxScale: 2500,
+                minScale: 0
+            };
+
+            // Add the custom basemap to the map.
+            var map = new Map({
+                basemap: "osm"
+            });
+
+            var symbol = {
+                type: "simple",  // autocasts as new SimpleRenderer()
+                symbol: {
+                    type: "simple-fill",  // autocasts as new SimpleMarkerSymbol()
+                    size: 6,
+                    color: "transparent",
+                    outline: {  // autocasts as new SimpleLineSymbol()
+                        width: 0.5,
+                        color: "black"
+                    }
+                }
+            };
+
+            // Parcels from the state of WA
+            var stateParcels = new FeatureLayer({
+                url: "https://services.arcgis.com/jsIt88o09Q0r1j8h/arcgis/rest/services/Current_Parcels_2020/FeatureServer/0/",
+                opacity: 0.8,
+                labelingInfo: [stateParcelslabelClass],
+                maxScale: 0,
+                minScale: 200000
+            });
+
+            stateParcels.renderer = symbol;
+
+            var stateTemplate = {
+                // autocasts as new PopupTemplate()
+                title: "{ORIG_PARCEL_ID}",
+            };
+
+            stateParcels.popupTemplate = stateTemplate;
+
+            // Parcels from the state of WA
+            var countyBoundariesOutlines = new FeatureLayer({
+                url: "https://gis.dnr.wa.gov/site3/rest/services/Public_Boundaries/WADNR_PUBLIC_Cadastre_OpenData/MapServer/11/",
+                opacity: 0.8,
+                labelingInfo: [countyBoundarieslabelClass],
+                maxScale: 2500,
+                minScale: 0
+            });
+
+            countyBoundariesOutlines.renderer = symbol;
+
+            // Add the layers to the map in a specific order.
+            map.add(countyBoundariesOutlines);
+            // This is a service that the state maintains that is a snapshot of all the parcel in the state.
+            map.add(stateParcels);
+
+
+            // Create a view of the map and render it to the DOM.
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-121.0, 47.61], // longitude, latitude.
+                zoom: 6 // Parcels aren't visible above zoom level 16.
+            });
+
+            view.constraints = {
+                minScale: 2500000,  // User cannot zoom out beyond a scale of 1:500,000
+                maxScale: 0,  // User can overzoom tiles
+                rotationEnabled: false  // Disables map rotation
+            };
+
+            var locatorSymbol = {
+                type: "simple-marker",  // autocasts as new SimpleMarkerSymbol()
+                style: "circle",
+                color: "red",
+                size: "20px",  // pixels
+                outline: {  // autocasts as new SimpleLineSymbol()
+                    color: [255, 255, 255],
+                    width: 1  // points
+                }
+            };
+
+            var searchWidget = new Search({
+                view: view,
+                allPlaceholder: "Parcel Number or Address",
+                sources: [
+                    // Adds the Four County composite locator.
+                    {
+                        locator: new Locator({ url: "https://gismaps.kingcounty.gov/arcgis/rest/services/Address/FourCounty_composite_locator/GeocodeServer" }),
+                        singleLineFieldName: "SingleLine",
+                        name: "All Counties",
+                        placeholder: "Address with City and Zip or a Parcel Number",
+                        resultSymbol: locatorSymbol,
+                        maxResults: 3,
+                        maxSuggestions: 6,
+                        suggestionsEnabled: true,
+                        minSuggestCharacters: 3,
+                        popupEnabled: false,
+                        zoomScale: 0
+                    }
+                ],
+                // Remove the ESRI world geocoder.
+                includeDefaultSources: false
+            });
+
+            // Adds the search widget to the top right corner of the view
+            view.ui.add(
+                searchWidget,
+                "top-right"
+            );
+
+            searchWidget.on("search-complete", function (event) {
+                // The results are stored in the event Object[]
+                console.log("Results of the search: ", event);
+                console.log(event.results[0].results[0].extent.center.latitude);
+                console.log(event.results[0].results[0].extent.center.longitude);
+                console.log(map.layers);
+
+            });
+
+
+        });
+    </script>
+</head>
+
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>
